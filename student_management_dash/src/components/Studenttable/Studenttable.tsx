@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import {
   DataGrid,
@@ -21,7 +23,7 @@ import {
 } from "@/src/services/studentService";
 
 import { Student } from "@/src/types/student";
-
+import ConfirmDialog from "@/src/components/ConfirmDialog/ConfirmDialog";
 import StudentFilters from "@/src/components/StudentFilter/StudentFilters";
 
 export default function Studenttable() {
@@ -45,6 +47,8 @@ export default function Studenttable() {
 
   const [appliedScore, setAppliedScore] =
     useState("All");
+
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const router = useRouter();
 
@@ -80,9 +84,11 @@ export default function Studenttable() {
     setAppliedScore("All");
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = () => {
+    if (deleteId === null) return;
+
     const updatedStudents = students.filter(
-      (student) => student.id !== id
+      (student) => student.id !== deleteId
     );
 
     localStorage.setItem(
@@ -91,6 +97,8 @@ export default function Studenttable() {
     );
 
     setStudents(updatedStudents);
+
+    setDeleteId(null);
   };
 
   const filteredStudents = useMemo(() => {
@@ -121,11 +129,11 @@ export default function Studenttable() {
         appliedScore === "All"
           ? true
           : appliedScore === "0-50"
-          ? student.score <= 50
-          : appliedScore === "51-75"
-          ? student.score >= 51 &&
-            student.score <= 75
-          : student.score >= 76;
+            ? student.score <= 50
+            : appliedScore === "51-75"
+              ? student.score >= 51 &&
+              student.score <= 75
+              : student.score >= 76;
 
       return (
         searchMatch &&
@@ -171,17 +179,21 @@ export default function Studenttable() {
     {
       field: "actions",
       headerName: "Actions",
-      flex: 1.5,
+      flex: 1,
       sortable: false,
+      filterable: false,
 
       renderCell: (params) => (
         <Box
           sx={{
             display: "flex",
             gap: 1,
+            alignItems: "center",
           }}
         >
+          {/* View */}
           <IconButton
+            color="primary"
             onClick={() =>
               router.push(
                 `/students/${params.row.id}`
@@ -191,26 +203,27 @@ export default function Studenttable() {
             <VisibilityIcon />
           </IconButton>
 
-          <Button
-            size="small"
+          {/* Edit */}
+          <IconButton
+            color="primary"
             onClick={() =>
               router.push(
                 `/students/${params.row.id}/edit`
               )
             }
           >
-            Edit
-          </Button>
+            <EditIcon />
+          </IconButton>
 
-          <Button
-            size="small"
+          {/* Delete */}
+          <IconButton
             color="error"
             onClick={() =>
-              handleDelete(params.row.id)
+              setDeleteId(params.row.id)
             }
           >
-            Delete
-          </Button>
+            <DeleteIcon />
+          </IconButton>
         </Box>
       ),
     },
@@ -257,6 +270,12 @@ export default function Studenttable() {
           },
         }}
         disableRowSelectionOnClick
+      />
+
+      <ConfirmDialog
+        open={deleteId !== null}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleDelete}
       />
 
     </Box>
