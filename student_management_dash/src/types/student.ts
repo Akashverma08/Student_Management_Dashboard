@@ -1,7 +1,7 @@
 export interface Student {
   id: number;
 
-  // Personal
+ 
   firstName: string;
   lastName: string;
   email: string;

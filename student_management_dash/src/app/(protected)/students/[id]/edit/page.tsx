@@ -3,28 +3,70 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
+import { Box, Typography } from "@mui/material";
+
+import Sidebar from "@/src/components/Sidebar/Sidebar";
 import StudentForm from "@/src/components/StudentForm/StudentForm";
+
 import { getStudentById } from "@/src/services/studentService";
 import { Student } from "@/src/types/student";
 
 export default function EditStudentPage() {
-    const params = useParams();
 
-    const [student, setStudent] = useState<Student | null>(null);
+  const params = useParams();
 
-    useEffect(() => {
-        const id = Number(params.id);
+  const [student, setStudent] =
+    useState<Student | null>(null);
 
-        const data = getStudentById(id);
+  useEffect(() => {
 
-        if (data) {
-            setStudent(data);
-        }
-    }, [params.id]);
+    const id = Number(params.id);
 
-    if (!student) {
-        return <div>Student not found</div>;
+    const data = getStudentById(id);
+
+    if (data) {
+      setStudent(data);
     }
 
-    return <StudentForm student={student} />;
+  }, [params.id]);
+
+  if (!student) {
+    return <div>Student not found</div>;
+  }
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "calc(100vh - 70px)",
+      }}
+    >
+
+      <Sidebar />
+
+      <Box
+        component="main"
+        sx={{
+          flex: 1,
+          p: 3,
+          backgroundColor: "#f8fafc",
+        }}
+      >
+
+        <Typography
+          variant="h4"
+          sx={{
+            fontWeight: 600,
+            mb: 3,
+          }}
+        >
+          Edit Student
+        </Typography>
+
+        <StudentForm student={student} />
+
+      </Box>
+
+    </Box>
+  );
 }

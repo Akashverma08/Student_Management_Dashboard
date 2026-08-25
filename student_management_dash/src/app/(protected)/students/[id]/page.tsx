@@ -178,7 +178,7 @@ export default function StudentDetailsPage() {
                     variant="contained"
                     startIcon={<EditIcon />}
                     onClick={() =>
-                        router.push(`/students/edit/${student.id}`)
+                        router.push(`/students/${student.id}/edit`)
                     }
                 >
                     Edit Student

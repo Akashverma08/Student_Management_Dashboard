@@ -7,10 +7,10 @@ export default function Dashboard() {
   return (
     <Box sx={{ display: "flex", minHeight: "70vh" }}>
       
-      {/* Sidebar */}
+
       <Sidebar />
 
-      {/* Main Content */}
+
       <Box
         component="main"
         sx={{

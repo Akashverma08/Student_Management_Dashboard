@@ -12,7 +12,8 @@ export const personalSchema = Yup.object({
         .required("Email is required"),
 
     phone: Yup.string()
-        .required("Phone is required"),
+        .required("Phone is required")
+        .matches(/^[0-9]{10}$/, "Phone number must be exactly 10 digits"),
 
     dob: Yup.string()
         .required("Date of birth is required"),

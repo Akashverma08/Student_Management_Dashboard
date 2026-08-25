@@ -4,10 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Formik, Form } from "formik";
 import { Student } from "@/src/types/student";
-import {
-    createStudent,
-    updateStudent,
-} from "@/src/services/studentService";
+import {createStudent,updateStudent,} from "@/src/services/studentService";
 import {
     Box,
     Stepper,
