@@ -126,6 +126,19 @@ export default function CourseStep({
                         name="score"
                         fullWidth
                     />
+
+                    <Field
+                        as={TextField}
+                        type="number"
+                        label="Pending Assignments"
+                        name="pendingAssignments"
+                        fullWidth
+                        slotProps={{
+                            htmlInput: {
+                                min: 0,
+                            },
+                        }}
+                    />
                 </>
             )}
 

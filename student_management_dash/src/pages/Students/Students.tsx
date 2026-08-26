@@ -3,13 +3,13 @@
 import { Box, Typography, Button } from "@mui/material";
 import Link from "next/link";
 
-import Sidebar from "@/src/components/Sidebar/Sidebar";
+
 import Studenttable from "@/src/components/Studenttable/Studenttable";
 
 export default function Students() {
   return (
     <Box sx={{ display: "flex", minHeight: "70vh" }}>
-      <Sidebar />
+
 
       <Box
         component="main"

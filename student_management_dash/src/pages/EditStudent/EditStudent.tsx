@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 
 import { Box, Typography } from "@mui/material";
 
-import Sidebar from "@/src/components/Sidebar/Sidebar";
+
 import StudentForm from "@/src/components/StudentForm/StudentForm";
 
 import { getStudentById } from "@/src/services/studentService";
@@ -41,7 +41,7 @@ export default function EditStudent() {
                 minHeight: "calc(100vh - 70px)",
             }}
         >
-            <Sidebar />
+
 
             <Box
                 component="main"

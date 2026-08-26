@@ -2,6 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useStudents } from "@/src/hooks/useStudents";
+
+import { useDebounce } from "@/src/hooks/useDebounce";
 
 import {
   Box,
@@ -9,6 +12,9 @@ import {
   IconButton,
 } from "@mui/material";
 
+
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -27,12 +33,19 @@ import ConfirmDialog from "@/src/components/ConfirmDialog/ConfirmDialog";
 import StudentFilters from "@/src/components/StudentFilter/StudentFilters";
 
 export default function Studenttable() {
-  const [students, setStudents] =
-    useState<Student[]>([]);
+
+  const {
+    students,
+    loading,
+    error,
+    addStudent,
+    updateStudent,
+    deleteStudent
+  } = useStudents();
+
 
   const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] =
-    useState("");
+
 
   const [course, setCourse] = useState("All");
   const [status, setStatus] = useState("All");
@@ -52,18 +65,12 @@ export default function Studenttable() {
 
   const router = useRouter();
 
-  useEffect(() => {
-    setStudents(getStudents());
-  }, []);
+
 
   // Debounce Search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearch(search);
-    }, 500);
+  const debouncedSearch = useDebounce(search, 500);
 
-    return () => clearTimeout(timer);
-  }, [search]);
+
 
   const handleApply = () => {
     setAppliedCourse(course);
@@ -73,7 +80,6 @@ export default function Studenttable() {
 
   const handleReset = () => {
     setSearch("");
-    setDebouncedSearch("");
 
     setCourse("All");
     setStatus("All");
@@ -84,21 +90,18 @@ export default function Studenttable() {
     setAppliedScore("All");
   };
 
+
+
   const handleDelete = () => {
     if (deleteId === null) return;
 
-    const updatedStudents = students.filter(
-      (student) => student.id !== deleteId
-    );
-
-    localStorage.setItem(
-      "students",
-      JSON.stringify(updatedStudents)
-    );
-
-    setStudents(updatedStudents);
+    deleteStudent(deleteId);
 
     setDeleteId(null);
+
+    toast.success(
+      "Student deleted successfully!"
+    );
   };
 
   const filteredStudents = useMemo(() => {
@@ -274,9 +277,19 @@ export default function Studenttable() {
 
       <ConfirmDialog
         open={deleteId !== null}
+        studentName={
+          [
+            students.find((student) => student.id === deleteId)?.firstName,
+            students.find((student) => student.id === deleteId)?.lastName,
+          ]
+            .filter(Boolean)
+            .join(" ")
+        }
         onClose={() => setDeleteId(null)}
         onConfirm={handleDelete}
       />
+
+      <ToastContainer />
 
     </Box>
   );

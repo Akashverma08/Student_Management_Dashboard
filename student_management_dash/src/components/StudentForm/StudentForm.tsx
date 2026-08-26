@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Formik, Form } from "formik";
 import { Student } from "@/src/types/student";
-import {createStudent,updateStudent,} from "@/src/services/studentService";
+import { useStudents } from "@/src/hooks/useStudents";
 import {
     Box,
     Stepper,
@@ -39,6 +39,10 @@ interface StudentFormProps {
 export default function StudentForm({
     student,
 }: StudentFormProps) {
+    const {
+        addStudent,
+        updateStudent,
+    } = useStudents();
 
 
     const [activeStep, setActiveStep] = useState(0);
@@ -60,6 +64,8 @@ export default function StudentForm({
 
         status: student?.status || "Active",
         score: student?.score ?? 0,
+
+        pendingAssignments: student?.pendingAssignments ?? 0,
     };
 
     return (
@@ -77,7 +83,6 @@ export default function StudentForm({
 
             onSubmit={(values) => {
                 if (student) {
-                    // EDIT
                     updateStudent(student.id, {
                         ...student,
 
@@ -95,10 +100,12 @@ export default function StudentForm({
 
                         status: values.status,
                         score: Number(values.score),
+                        pendingAssignments: Number(
+                            values.pendingAssignments
+                        ),
                     });
                 } else {
-                    // ADD
-                    createStudent({
+                    addStudent({
                         id: Date.now(),
 
                         firstName: values.firstName,

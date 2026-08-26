@@ -12,13 +12,20 @@ import {
 import SchoolIcon from "@mui/icons-material/School";
 import LogoutIcon from "@mui/icons-material/Logout";
 
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import { useAuth } from "@/src/context/AuthContext";
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
+
+  const { user, setUser } = useAuth();
 
   const handleLogout = () => {
-    localStorage.setItem("isLoggedIn", "false");
+    localStorage.removeItem("isLoggedIn");
+    localStorage.removeItem("userName");
+
+    setUser(null);
 
     router.push("/login");
   };
@@ -87,24 +94,29 @@ export default function Header() {
             gap: 2,
           }}
         >
-          <Typography
-            variant="body2"
-            sx={{
-              fontWeight: 500,
-              color: "text.secondary",
-            }}
-          >
-            Admin Panel
-          </Typography>
+          {user && (
+            <Typography
+              variant="body2"
+              sx={{
+                fontWeight: 500,
+                color: "text.secondary",
+              }}
+            >
+              {user.name} • {user.role}
+            </Typography>
+          )}
 
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<LogoutIcon />}
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
+          {/* Hide Logout on Login page */}
+          {pathname !== "/login" && (
+            <Button
+              variant="outlined"
+              color="error"
+              startIcon={<LogoutIcon />}
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          )}
         </Box>
       </Toolbar>
     </AppBar>

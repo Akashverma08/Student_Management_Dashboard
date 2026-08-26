@@ -2,13 +2,12 @@
 
 import { Box, Typography } from "@mui/material";
 
-import Sidebar from "@/src/components/Sidebar/Sidebar";
 import StudentForm from "@/src/components/StudentForm/StudentForm";
 
 export default function AddStudent() {
   return (
     <Box sx={{ display: "flex", minHeight: "calc(100vh - 70px)" }}>
-      <Sidebar />
+     
 
       <Box
         component="main"

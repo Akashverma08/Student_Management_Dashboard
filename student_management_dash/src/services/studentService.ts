@@ -46,6 +46,22 @@ export function updateStudent(
   );
 }
 
+
+// Delete student
+export function deleteStudent(id: number) {
+  const students = getStudents();
+
+  const updatedStudents = students.filter(
+    (student) => student.id !== id
+  );
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(updatedStudents)
+  );
+}
+
+
 export function getStudentStats(students: Student[]) {
   const total = students.length;
 

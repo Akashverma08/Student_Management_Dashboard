@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 
-import Header from  "@/src/components/Header/Header"
+import Header from "@/src/components/Header/Header";
 import Footer from "@/src/components/Footer/Footer";
+import { AuthProvider } from "@/src/context/AuthContext";
 
 import "./globals.css";
 
@@ -34,13 +35,17 @@ export default function RootLayout({
 
         <AppRouterCacheProvider>
 
-          <Header />
+          <AuthProvider>
 
-          <main className="flex-1">
-            {children}
-          </main>
+            <Header />
 
-          <Footer />
+            <main className="flex-1">
+              {children}
+            </main>
+
+            <Footer />
+
+          </AuthProvider>
 
         </AppRouterCacheProvider>
 

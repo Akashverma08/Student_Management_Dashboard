@@ -5,18 +5,21 @@ import { useParams, useRouter } from "next/navigation";
 
 import {
     Box,
-    Card,
-    CardContent,
-    Typography,
     Button,
     Chip,
     Divider,
+    Stack,
+    Typography,
 } from "@mui/material";
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
 
-import Sidebar from "@/src/components/Sidebar/Sidebar";
+
+import StudentProfileCard from "@/src/components/StudentView/StudentProfileCard";
+import PersonalInfoCard from "@/src/components/StudentView/PersonalInfoCard";
+import CourseInfoCard from "@/src/components/StudentView/CourseInfoCard";
+import ProgressCard from "@/src/components/StudentView/ProgressCard";
 
 import { getStudentById } from "@/src/services/studentService";
 import { Student } from "@/src/types/student";
@@ -24,15 +27,12 @@ import { Student } from "@/src/types/student";
 export default function StudentDetails() {
     const params = useParams<{ id: string }>();
     const id = params?.id;
-
     const router = useRouter();
 
-    const [student, setStudent] = useState<Student | undefined>();
+    const [student, setStudent] = useState<Student>();
 
     useEffect(() => {
-        const studentData = getStudentById(Number(id));
-
-        setStudent(studentData);
+        setStudent(getStudentById(Number(id)));
     }, [id]);
 
     if (!student) {
@@ -43,9 +43,9 @@ export default function StudentDetails() {
                 </Typography>
 
                 <Button
+                    sx={{ mt: 2 }}
                     startIcon={<ArrowBackIcon />}
                     onClick={() => router.push("/students")}
-                    sx={{ mt: 2 }}
                 >
                     Back to Students
                 </Button>
@@ -60,171 +60,97 @@ export default function StudentDetails() {
                 minHeight: "calc(100vh - 70px)",
             }}
         >
-            {/* Sidebar */}
-            <Sidebar />
 
-            {/* Main Content */}
+
             <Box
                 component="main"
                 sx={{
                     flex: 1,
-                    p: 3,
-                    backgroundColor: "#f8fafc",
+                    p: { xs: 2, md: 4 },
+                    backgroundColor: "#f5f7fa",
                 }}
             >
-                <Box
-                    sx={{
-                        maxWidth: 1100,
-                        mx: "auto",
-                        pb: 12,
-                    }}
-                >
+                <Box sx={{ maxWidth: 1000, mx: "auto" }}>
 
                     {/* Header */}
-                    <Box
+                    <Stack
+                        direction="row"
                         sx={{
-                            display: "flex",
                             justifyContent: "space-between",
                             alignItems: "center",
                             mb: 3,
                         }}
                     >
-                        <Typography variant="h4">
-                            Student Details
-                        </Typography>
+                        <Box>
+                            <Typography
+                                variant="h4"
+                                sx={{ fontWeight: 700 }}
+                            >
+                                Student Profile
+                            </Typography>
+
+                            <Typography color="text.secondary">
+                                View student information and progress
+                            </Typography>
+                        </Box>
 
                         <Chip
                             label={student.status}
-                            color={
-                                student.status === "Active"
-                                    ? "success"
-                                    : "default"
-                            }
+                            sx={{
+                                fontWeight: 600,
+                                color: "white",
+                                backgroundColor:
+                                    student.status === "Active"
+                                        ? "#2e7d32"       // Green
+                                        : student.status === "Completed"
+                                            ? "#edb100"    // Yellow
+                                            : "#d32f2f",   // Red
+                            }}
                         />
-                    </Box>
+                    </Stack>
 
-                    {/* Personal Information */}
-                    <Card sx={{ mb: 3 }}>
-                        <CardContent>
+                    {/* Student Profile */}
+                    <StudentProfileCard student={student} />
+                    <Divider sx={{ my: 3 }} />
 
-                            <Typography
-                                variant="h6"
-                                sx={{ mb: 2 }}
-                            >
-                                Personal Information
-                            </Typography>
-
-                            <Typography>
-                                <b>Name:</b>{" "}
-                                {student.firstName}{" "}
-                                {student.lastName}
-                            </Typography>
-
-                            <Typography sx={{ mt: 1 }}>
-                                <b>Email:</b>{" "}
-                                {student.email}
-                            </Typography>
-
-                            <Typography sx={{ mt: 1 }}>
-                                <b>Phone:</b>{" "}
-                                {student.phone}
-                            </Typography>
-
-                            <Typography sx={{ mt: 1 }}>
-                                <b>Date of Birth:</b>{" "}
-                                {student.dob}
-                            </Typography>
-
-                        </CardContent>
-                    </Card>
-
-                    {/* Course Information */}
-                    <Card sx={{ mb: 3 }}>
-                        <CardContent>
-
-                            <Typography
-                                variant="h6"
-                                sx={{ mb: 2 }}
-                            >
-                                Course Information
-                            </Typography>
-
-                            <Typography>
-                                <b>Course:</b>{" "}
-                                {student.course}
-                            </Typography>
-
-                            <Typography sx={{ mt: 1 }}>
-                                <b>Batch:</b>{" "}
-                                {student.batch}
-                            </Typography>
-
-                            <Typography sx={{ mt: 1 }}>
-                                <b>Start Date:</b>{" "}
-                                {student.startDate}
-                            </Typography>
-
-                            <Typography sx={{ mt: 1 }}>
-                                <b>Trainer:</b>{" "}
-                                {student.trainer}
-                            </Typography>
-
-                            <Typography sx={{ mt: 1 }}>
-                                <b>Experience:</b>{" "}
-                                {student.experience}
-                            </Typography>
-
-                        </CardContent>
-                    </Card>
 
                     {/* Progress */}
-                    <Card sx={{ mb: 3 }}>
-                        <CardContent>
 
-                            <Typography
-                                variant="h6"
-                                sx={{ mb: 2 }}
-                            >
-                                Progress
-                            </Typography>
+                    <ProgressCard student={student} />
 
-                            <Typography>
-                                <b>Score:</b>{" "}
-                                {student.score}%
-                            </Typography>
+                    <Divider sx={{ my: 3 }} />
 
-                            <Typography sx={{ mt: 1 }}>
-                                <b>
-                                    Pending Assignments:
-                                </b>{" "}
-                                {student.pendingAssignments}
-                            </Typography>
-
-                        </CardContent>
-                    </Card>
-
-                    <Divider sx={{ mb: 3 }} />
-
-                    {/* Buttons */}
+                    {/* Personal + Course */}
                     <Box
                         sx={{
-                            display: "flex",
-                            gap: 2,
+                            display: "grid",
+                            gridTemplateColumns: {
+                                xs: "1fr",
+                                md: "1fr 1fr",
+                            },
+                            gap: 3,
                         }}
                     >
+                        <PersonalInfoCard student={student} />
 
-                        {/* Back */}
+                        <CourseInfoCard student={student} />
+                    </Box>
+
+                    
+                    
+
+                    <Divider sx={{ my: 3 }} />
+
+                    {/* Actions */}
+                    <Stack direction="row" spacing={2}>
                         <Button
                             variant="outlined"
                             startIcon={<ArrowBackIcon />}
-                            onClick={() =>
-                                router.push("/students")
-                            }
+                            onClick={() => router.push("/students")}
                         >
                             Back
                         </Button>
 
-                        {/* Edit */}
                         <Button
                             variant="contained"
                             startIcon={<EditIcon />}
@@ -236,8 +162,7 @@ export default function StudentDetails() {
                         >
                             Edit Student
                         </Button>
-
-                    </Box>
+                    </Stack>
 
                 </Box>
             </Box>

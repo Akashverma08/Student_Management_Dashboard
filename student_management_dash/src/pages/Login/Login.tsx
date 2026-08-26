@@ -11,8 +11,11 @@ import {
   Paper,
 } from "@mui/material";
 
+import { useAuth } from "@/src/context/AuthContext";
+
 export default function Login() {
   const router = useRouter();
+  const { setUser } = useAuth();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -24,6 +27,11 @@ export default function Login() {
     if (username === "admin" && password === "Akash@0401") {
       localStorage.setItem("isLoggedIn", "true");
 
+      setUser({
+        name: "Akash Verma",
+        role: "Administrator",
+      });
+
       router.push("/dashboard");
     } else {
       setError("Invalid username or password");
@@ -33,22 +41,28 @@ export default function Login() {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        minHeight: "calc(100vh - 94px)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        backgroundColor: "#f5f7fa",
       }}
     >
       <Paper
         elevation={3}
         sx={{
           width: 400,
-          padding: 4,
+          p: 4,
+          borderRadius: 2,
         }}
       >
         <Typography
           variant="h4"
-          sx={{ textAlign: "center", mb: 3 }}
+          sx={{
+            textAlign: "center",
+            fontWeight: 600,
+            mb: 3,
+          }}
         >
           Login
         </Typography>
@@ -87,7 +101,10 @@ export default function Login() {
             fullWidth
             variant="contained"
             type="submit"
-            sx={{ mt: 3 }}
+            sx={{
+              mt: 3,
+              py: 1.2,
+            }}
           >
             Login
           </Button>

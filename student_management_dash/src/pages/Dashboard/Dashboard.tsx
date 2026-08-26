@@ -2,14 +2,14 @@
 
 import { Box, Typography } from "@mui/material";
 
-import Sidebar from "@/src/components/Sidebar/Sidebar";
+
 import DashboardStats from "@/src/components/DashboardStats/DashboardStats";
 
 export default function Dashboard() {
   return (
     <Box sx={{ display: "flex", minHeight: "70vh" }}>
 
-      <Sidebar />
+
 
       <Box
         component="main"

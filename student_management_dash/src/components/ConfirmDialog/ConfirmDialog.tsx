@@ -11,27 +11,26 @@ import {
 
 interface ConfirmDialogProps {
   open: boolean;
+  studentName: string;
   onClose: () => void;
   onConfirm: () => void;
 }
 
 export default function ConfirmDialog({
   open,
+  studentName,
   onClose,
   onConfirm,
 }: ConfirmDialogProps) {
   return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-    >
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>
         Delete Student
       </DialogTitle>
 
       <DialogContent>
         <DialogContentText>
-          Are you sure you want to delete this student?
+          Are you sure you want to delete {studentName}?
         </DialogContentText>
       </DialogContent>
 
