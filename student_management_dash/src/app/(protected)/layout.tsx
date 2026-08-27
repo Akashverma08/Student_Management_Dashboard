@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+
 import { Box } from "@mui/material";
 
 import Sidebar from "@/src/components/Sidebar/Sidebar";
+
+import { useAuth } from "@/src/context/AuthContext";
 
 export default function ProtectedLayout({
     children,
@@ -12,20 +15,78 @@ export default function ProtectedLayout({
     children: React.ReactNode;
 }) {
     const router = useRouter();
+    const pathname = usePathname() ?? "";
+
+    const { user, initialized } = useAuth();
 
     useEffect(() => {
-        const loggedIn = localStorage.getItem("isLoggedIn");
+        // Wait until AuthContext loads user from localStorage
+        if (!initialized) return;
 
-        if (loggedIn !== "true") {
+        // Not logged in
+        if (!user) {
             router.replace("/login");
+            return;
         }
-    }, [router]);
+
+        // ---------------- STUDENT ROUTES ----------------
+        if (user.role === "student") {
+            const studentAllowedRoutes = [
+                "/profile",
+                "/profile/edit",
+                "/events",
+            ];
+
+            const isAllowed = studentAllowedRoutes.some(
+                (route) =>
+                    pathname === route ||
+                    pathname.startsWith(`${route}/`)
+            );
+
+            if (!isAllowed) {
+                router.replace("/profile");
+            }
+
+            return;
+        }
+
+        // ---------------- ADMIN ROUTES ----------------
+        if (user.role === "Administrator") {
+            const adminAllowedRoutes = [
+                "/dashboard",
+                "/students",
+                "/analytics",
+                "/courses",
+                "/events",
+            ];
+
+            const isAllowed = adminAllowedRoutes.some(
+                (route) =>
+                    pathname === route ||
+                    pathname.startsWith(`${route}/`)
+            );
+
+            if (!isAllowed) {
+                router.replace("/dashboard");
+            }
+        }
+    }, [user, initialized, pathname, router]);
+
+    // Don't render protected content until auth is checked
+    if (!initialized) {
+        return null;
+    }
+
+    if (!user) {
+        return null;
+    }
 
     return (
         <Box
             sx={{
                 display: "flex",
                 minHeight: "calc(100vh - 70px)",
+                backgroundColor: "#f5f7fa",
             }}
         >
             <Sidebar />
@@ -34,6 +95,8 @@ export default function ProtectedLayout({
                 component="main"
                 sx={{
                     flex: 1,
+                    backgroundColor: "#f5f7fa",
+                    p: 3,
                 }}
             >
                 {children}
