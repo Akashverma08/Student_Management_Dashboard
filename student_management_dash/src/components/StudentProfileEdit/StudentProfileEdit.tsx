@@ -8,6 +8,7 @@ import {
   Card,
   CardContent,
   Grid,
+  MenuItem,
   TextField,
   Typography,
 } from "@mui/material";
@@ -30,7 +31,7 @@ export default function StudentProfileEdit({
 
   const handleChange = (
     field: keyof Student,
-    value: string
+    value: string | number
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -38,24 +39,55 @@ export default function StudentProfileEdit({
     }));
   };
 
-  const editableFields = [
+  // All fields will be displayed
+  const fields = [
     ["First Name", "firstName"],
     ["Last Name", "lastName"],
+    ["Email", "email"],
     ["Phone", "phone"],
+    ["Date of Birth", "dob"],
+    ["Course", "course"],
+    ["Batch", "batch"],
+    ["Start Date", "startDate"],
+    ["Trainer", "trainer"],
+    ["Experience", "experience"],
+    ["Status", "status"],
+    ["Score", "score"],
+    ["Pending Assignments", "pendingAssignments"],
   ] as const;
 
-  const readOnlyFields = [
-    ["Email", student.email],
-    ["Date of Birth", student.dob],
-    ["Course", student.course],
-    ["Batch", student.batch],
-    ["Start Date", student.startDate],
-    ["Trainer", student.trainer],
-    ["Experience", student.experience],
-    ["Status", student.status],
-    ["Score", student.score],
-    ["Pending Assignments", student.pendingAssignments],
+  // Only these fields are editable
+  const editableFields = [
+    "firstName",
+    "lastName",
+    "email",
+    "dob",
+    "pendingAssignments",
   ];
+
+  const options: Record<string, string[]> = {
+    course: [
+      "React.js",
+      "Next.js",
+      "Node.js",
+      "Python",
+    ],
+    batch: [
+      "Batch 1",
+      "Batch 2",
+      "Batch 3",
+    ],
+    experience: [
+      "Beginner",
+      "Intermediate",
+      "Experienced",
+    ],
+    status: [
+      "Active",
+      "Completed",
+      "Inactive",
+    ],
+  };
 
   return (
     <Box sx={{ p: 3 }}>
@@ -73,8 +105,19 @@ export default function StudentProfileEdit({
         <CardContent>
           <Grid container spacing={3}>
 
-            {editableFields.map(
-              ([label, field]) => (
+            {fields.map(([label, field]) => {
+              const isEditable =
+                editableFields.includes(field);
+
+              const isNumber =
+                field === "score" ||
+                field === "pendingAssignments";
+
+              const isDate =
+                field === "dob" ||
+                field === "startDate";
+
+              return (
                 <Grid
                   size={{ xs: 12, md: 6 }}
                   key={field}
@@ -83,36 +126,49 @@ export default function StudentProfileEdit({
                     fullWidth
                     label={label}
                     value={formData[field]}
+                    type={
+                      isDate
+                        ? "date"
+                        : isNumber
+                        ? "number"
+                        : "text"
+                    }
+                    select={
+                      isEditable &&
+                      !!options[field]
+                    }
+                    disabled={!isEditable}
                     onChange={(e) =>
                       handleChange(
                         field,
-                        e.target.value
+                        isNumber
+                          ? Number(
+                              e.target.value
+                            )
+                          : e.target.value
                       )
                     }
-                  />
-                </Grid>
-              )
-            )}
-
-            {readOnlyFields.map(
-              ([label, value]) => (
-                <Grid
-                  size={{ xs: 12, md: 6 }}
-                  key={label}
-                >
-                  <TextField
-                    fullWidth
-                    label={label}
-                    value={value}
                     slotProps={{
-                      input: {
-                        readOnly: true,
+                      inputLabel: {
+                        shrink: true,
                       },
                     }}
-                  />
+                  >
+                    {isEditable &&
+                      options[field]?.map(
+                        (option) => (
+                          <MenuItem
+                            key={option}
+                            value={option}
+                          >
+                            {option}
+                          </MenuItem>
+                        )
+                      )}
+                  </TextField>
                 </Grid>
-              )
-            )}
+              );
+            })}
 
             <Grid size={{ xs: 12 }}>
               <Box

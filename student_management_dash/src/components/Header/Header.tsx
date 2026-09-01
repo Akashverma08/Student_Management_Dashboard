@@ -22,8 +22,8 @@ export default function Header() {
   const { user, setUser } = useAuth();
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userName");
+    sessionStorage.removeItem("isLoggedIn");
+    sessionStorage.removeItem("user");
 
     setUser(null);
 

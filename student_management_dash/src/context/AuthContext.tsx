@@ -8,14 +8,7 @@ import {
   ReactNode,
 } from "react";
 
-type UserRole = "Administrator" | "student";
-
-interface User {
-  name: string;
-  role: UserRole;
-  studentId?: number;
-  email?: string;
-}
+import { User } from "@/src/types/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -23,35 +16,47 @@ interface AuthContextType {
   initialized: boolean;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(
-  undefined
-);
+const AuthContext =
+  createContext<AuthContextType | undefined>(
+    undefined
+  );
 
 export function AuthProvider({
   children,
 }: {
   children: ReactNode;
 }) {
-  const [user, setUserState] = useState<User | null>(null);
-  const [initialized, setInitialized] = useState(false);
+  const [user, setUserState] =
+    useState<User | null>(null);
+
+  const [initialized, setInitialized] =
+    useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser =
+      sessionStorage.getItem("user");
 
     if (storedUser) {
-      setUserState(JSON.parse(storedUser));
+      setUserState(
+        JSON.parse(storedUser)
+      );
     }
 
     setInitialized(true);
   }, []);
 
-  const setUser = (user: User | null) => {
+  const setUser = (
+    user: User | null
+  ) => {
     setUserState(user);
 
     if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
+      sessionStorage.setItem(
+        "user",
+        JSON.stringify(user)
+      );
     } else {
-      localStorage.removeItem("user");
+      sessionStorage.removeItem("user");
     }
   };
 
@@ -69,7 +74,8 @@ export function AuthProvider({
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const context =
+    useContext(AuthContext);
 
   if (!context) {
     throw new Error(

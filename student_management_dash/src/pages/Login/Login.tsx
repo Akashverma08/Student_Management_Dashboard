@@ -5,98 +5,85 @@ import { useRouter } from "next/navigation";
 
 import {
   Box,
-  Button,
-  TextField,
-  Typography,
   Paper,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  FormLabel,
+  Typography,
 } from "@mui/material";
 
 import { useAuth } from "@/src/context/AuthContext";
-import { getStudents } from "@/src/services/studentService";
 
-type LoginType = "admin" | "student";
+import {
+  login as loginService,
+} from "@/src/services/authService";
+
+import LoginTypeSelector, {
+  LoginType,
+} from "@/src/components/Login/LoginTypeSelector";
+
+import LoginForm from "@/src/components/Login/LoginForm";
 
 export default function Login() {
   const router = useRouter();
+
   const { setUser } = useAuth();
 
-  const [loginType, setLoginType] = useState<LoginType>("student");
+  const [loginType, setLoginType] =
+    useState<LoginType>("student");
 
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] =
+    useState("");
 
-  const [error, setError] = useState("");
+  const [password, setPassword] =
+    useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [error, setError] =
+    useState("");
+
+  const handleLogin = (
+    e: React.FormEvent
+  ) => {
     e.preventDefault();
 
     setError("");
 
-    // =========================
-    // ADMIN LOGIN
-    // =========================
-    if (loginType === "admin") {
-      if (
-        username === "admin" &&
-        password === "Akash@0401"
-      ) {
-        localStorage.setItem("isLoggedIn", "true");
-
-        setUser({
-          name: "Akash Verma",
-          role: "Administrator",
-        });
-
-        router.push("/dashboard");
-        return;
-      }
-
-      setError("Invalid admin username or password");
-      return;
-    }
-
-    // =========================
-    // STUDENT LOGIN
-    // =========================
     try {
-      const students = getStudents();
+      const user = loginService(
+        loginType,
+        username,
+        password
+      );
 
-      const student = students.find((student) => {
-        const [year, month, day] =
-          student.dob.split("-");
+      if (!user) {
+        if (loginType === "admin") {
+          setError(
+            "Invalid admin username or password"
+          );
+        } else {
+          setError(
+            "Invalid student email or date of birth"
+          );
+        }
 
-        const formattedDob =
-          `${day}${month}${year}`;
-
-        return (
-          student.email.toLowerCase() ===
-            username.toLowerCase() &&
-          formattedDob === password
-        );
-      });
-
-      if (!student) {
-        setError("Invalid student email or date of birth");
         return;
       }
 
-      localStorage.setItem("isLoggedIn", "true");
+      setUser(user);
 
-      setUser({
-        name: `${student.firstName} ${student.lastName}`,
-        role: "student",
-        studentId: student.id,
-        email: student.email,
-      });
+      sessionStorage.setItem(
+        "isLoggedIn",
+        "true"
+      );
 
-      router.push("/profile");
+      if (user.role === "Administrator") {
+        router.push("/dashboard");
+      } else {
+        router.push("/profile");
+      }
+
     } catch (error) {
-      console.error("Login error:", error);
+      console.error(
+        "Login error:",
+        error
+      );
 
       setError(
         "Unable to login. Please try again."
@@ -109,20 +96,41 @@ export default function Login() {
   ) => {
     setLoginType(value);
 
-    // Clear old credentials/errors
     setUsername("");
     setPassword("");
+    setError("");
+  };
+
+  const handleUsernameChange = (
+    value: string
+  ) => {
+    setUsername(value);
+    setError("");
+  };
+
+  const handlePasswordChange = (
+    value: string
+  ) => {
+    setPassword(value);
     setError("");
   };
 
   return (
     <Box
       sx={{
-        minHeight: "calc(100vh - 94px)",
+        minHeight:
+          "calc(100vh - 94px)",
+
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "#f5f7fa",
+
+        justifyContent:
+          "center",
+
+        alignItems:
+          "center",
+
+        backgroundColor:
+          "#f5f7fa",
       }}
     >
       <Paper
@@ -144,100 +152,26 @@ export default function Login() {
           Login
         </Typography>
 
-        {/* LOGIN TYPE */}
-        <FormControl sx={{ mb: 2 }}>
-          <FormLabel>
-            Login As
-          </FormLabel>
+        <LoginTypeSelector
+          loginType={loginType}
+          onChange={
+            handleLoginTypeChange
+          }
+        />
 
-          <RadioGroup
-            row
-            value={loginType}
-            onChange={(e) =>
-              handleLoginTypeChange(
-                e.target.value as LoginType
-              )
-            }
-          >
-            <FormControlLabel
-              value="admin"
-              control={<Radio />}
-              label="Admin"
-            />
-
-            <FormControlLabel
-              value="student"
-              control={<Radio />}
-              label="Student"
-            />
-          </RadioGroup>
-        </FormControl>
-
-        <Box
-          component="form"
+        <LoginForm
+          loginType={loginType}
+          username={username}
+          password={password}
+          error={error}
+          onUsernameChange={
+            handleUsernameChange
+          }
+          onPasswordChange={
+            handlePasswordChange
+          }
           onSubmit={handleLogin}
-        >
-          {/* USERNAME / EMAIL */}
-          <TextField
-            fullWidth
-            label={
-              loginType === "admin"
-                ? "Username"
-                : "Email"
-            }
-            value={username}
-            onChange={(e) => {
-              setUsername(e.target.value);
-              setError("");
-            }}
-            margin="normal"
-          />
-
-          {/* PASSWORD / DOB */}
-          <TextField
-            fullWidth
-            label={
-              loginType === "admin"
-                ? "Password"
-                : "Date of Birth"
-            }
-            type="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              setError("");
-            }}
-            margin="normal"
-            placeholder={
-              loginType === "student"
-                ? "DDMMYYYY"
-                : ""
-            }
-          />
-
-          {/* ERROR */}
-          {error && (
-            <Typography
-              color="error"
-              sx={{ mt: 1 }}
-            >
-              {error}
-            </Typography>
-          )}
-
-          {/* LOGIN BUTTON */}
-          <Button
-            fullWidth
-            variant="contained"
-            type="submit"
-            sx={{
-              mt: 3,
-              py: 1.2,
-            }}
-          >
-            Login
-          </Button>
-        </Box>
+        />
       </Paper>
     </Box>
   );
