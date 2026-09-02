@@ -224,7 +224,7 @@ export default function StudentForm({
                                 onSubmit={submitForm}
                             />
 
-                        </Box>
+                        </Box>  
 
                     </Form>
                 );

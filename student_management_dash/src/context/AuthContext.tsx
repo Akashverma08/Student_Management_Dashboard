@@ -16,10 +16,7 @@ interface AuthContextType {
   initialized: boolean;
 }
 
-const AuthContext =
-  createContext<AuthContextType | undefined>(
-    undefined
-  );
+const AuthContext =createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({
   children,
@@ -74,8 +71,7 @@ export function AuthProvider({
 }
 
 export function useAuth() {
-  const context =
-    useContext(AuthContext);
+  const context =useContext(AuthContext);
 
   if (!context) {
     throw new Error(
